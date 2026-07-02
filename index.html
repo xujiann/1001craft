@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>1001 种精酿 · 1001 Craft Beers</title>
+<meta name="description" content="按常规风格分类，精选并展示世界上 1001 款经典精酿啤酒，从皮尔森到帝国世涛。A curated bilingual gallery of 1001 craft beers, organized by style—from Pilsner to Imperial Stout.">
+<meta name="theme-color" content="#170f06">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23b45309'/%3E%3Ctext x='16' y='23' font-size='18' text-anchor='middle'%3E%F0%9F%8D%BA%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-title">
+      <h1><span class="t-main">1001</span><span id="t-sub">种精酿</span></h1>
+      <p class="subtitle" id="t-subtitle">从皮尔森的金黄到帝国世涛的深邃</p>
+    </div>
+    <div class="header-right">
+      <div class="header-stats">
+        <span class="stat"><strong id="shown-count">0</strong> <span id="t-beers">款</span></span>
+        <span class="stat"><strong id="style-count">0</strong> <span id="t-styles">风格</span></span>
+      </div>
+      <button id="lang-toggle" class="lang-btn" title="语言 / Language">EN</button>
+    </div>
+  </div>
+</header>
+
+<div class="toolbar">
+  <div class="search-wrap">
+    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="search" placeholder="搜索名称、酒厂、风格…" autocomplete="off">
+    <button class="clear-btn" id="clear-search" title="清除">✕</button>
+  </div>
+  <div class="filter-row">
+    <select id="origin-filter"><option value="">全部产地</option></select>
+    <select id="sort-filter" aria-label="排序">
+      <option value="default">默认</option>
+      <option value="name">按名称</option>
+      <option value="abv">按酒精度</option>
+      <option value="brewery">按酒厂</option>
+    </select>
+    <button id="random-btn" class="btn-accent">随机一杯</button>
+  </div>
+</div>
+
+<nav class="cat-tabs" id="cat-tabs"></nav>
+
+<main class="gallery" id="gallery"></main>
+
+<div class="no-results" id="no-results" style="display:none">
+  <p id="t-noresults">未找到符合条件的精酿</p>
+  <button id="reset-btn">重置筛选</button>
+</div>
+
+<div class="modal-overlay" id="modal" role="dialog" aria-modal="true" aria-label="精酿详情">
+  <div class="modal-box">
+    <button class="modal-close" id="modal-close" aria-label="关闭">✕</button>
+    <div class="modal-content">
+      <div class="modal-img" id="modal-img"></div>
+      <div class="modal-info">
+        <div class="modal-cat-badge" id="modal-cat"></div>
+        <h2 id="modal-name"></h2>
+        <p class="modal-en" id="modal-en"></p>
+        <p class="modal-brewery" id="modal-brewery"></p>
+        <p class="modal-desc" id="modal-desc"></p>
+        <dl class="modal-meta">
+          <dt id="l-style">风格</dt><dd id="modal-style"></dd>
+          <dt id="l-abv">酒精度</dt><dd id="modal-abv"></dd>
+          <dt id="l-origin">产地</dt><dd id="modal-origin"></dd>
+        </dl>
+        <div class="modal-nav">
+          <button id="prev-beer">← 上一款</button>
+          <span id="modal-num"></span>
+          <button id="next-beer">下一款 →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <p id="t-footer">按常规风格分类，精选世界上的精酿啤酒 · 建设中</p>
+</footer>
+
+<script defer src="beers.js"></script>
+<script defer src="app.js"></script>
+</body>
+</html>
