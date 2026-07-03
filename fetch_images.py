@@ -40,6 +40,12 @@ grand cru reserve réserve abt trappist trappistes india""".split())
 BREW_COMMON = set("""samuel saint brasserie brouwerij brewery brewing brauerei company companie
 brothers finest liquids liquid state coast beer bier brau bräu nv inc ltd co the moortgat""".split())
 
+# 人工复核判为"同酒厂错款/变体/无法区分"的误配 —— 永久拉黑，强制走 emoji 兜底，不再抓取
+# 4/16/55=维森非目标款  56=施耐德错款 59=保拉纳柠檬 64=圣伯纳三料≠白 67=柏林Radler≠Weisse
+# 74=罗斯福8≠10  79=Delirium Red≠Tremens  90=早餐世涛配到KBS  94=Yeti配到巧克力橡木变体
+# 100=Fuller's配到London Pride  139=Rübæus配到Centennial IPA
+BAD_IDS = {4, 16, 55, 56, 59, 64, 67, 74, 79, 90, 94, 100, 139}
+
 def norm_tokens(s):
     s = re.sub(r"[^0-9a-zA-Zäöüßéèêàâçñ ]", " ", (s or "").lower())
     return [t for t in s.split() if len(t) >= 4]
@@ -131,6 +137,41 @@ def wiki_image(name_en, brewery_en):
         return url, d.get("title", title)
     return None
 
+COMMONS_API = "https://commons.wikimedia.org/w/api.php"
+
+def commons_image(name_en, brewery_en):
+    """Wikimedia Commons 文件搜索兜底（很多膜拜美酒有酒瓶照）。严格：文件标题须同时含
+    区分性酒名词 + (酒厂词或啤酒词)，且是位图，避免误配古籍 PDF/无关图。返回 (url, title) 或 None。"""
+    name_tok = norm_tokens(name_en)
+    brew_tok = [t for t in norm_tokens(brewery_en) if t not in BREW_COMMON]
+    distinct = [t for t in name_tok if t not in brew_tok and t not in STYLE]
+    if not distinct:
+        return None                                    # 无区分性酒名词 → 不冒险
+    q = urllib.parse.urlencode({
+        "action": "query", "generator": "search",
+        "gsrsearch": "%s %s beer" % (name_en, brewery_en),
+        "gsrnamespace": 6, "gsrlimit": 12,
+        "prop": "imageinfo", "iiprop": "url|mime", "iiurlwidth": 600, "format": "json",
+    })
+    d = http_json(COMMONS_API + "?" + q)
+    pages = sorted((d.get("query", {}).get("pages") or {}).values(),
+                   key=lambda p: p.get("index", 99))
+    BEERWORD = ("beer", "ale", "stout", "porter", "ipa", "lager", "pilsner", "bottle", "can")
+    for p in pages:
+        ii = (p.get("imageinfo") or [{}])[0]
+        mime = ii.get("mime", "")
+        if not mime.startswith("image/") or "svg" in mime:
+            continue
+        title = re.sub(r"^file:", "", (p.get("title", "") or "").lower())
+        if not any(t in title for t in distinct):
+            continue                                   # 须含区分性酒名词
+        if not (any(t in title for t in brew_tok) or any(w in title for w in BEERWORD)):
+            continue                                   # 再要求酒厂词或啤酒词，降误配
+        url = ii.get("thumburl") or ii.get("url")
+        if url:
+            return url, p.get("title", "")
+    return None
+
 def download(url, dest):
     req = urllib.request.Request(url, headers={"User-Agent": UA})
     with urllib.request.urlopen(req, timeout=60) as r:
@@ -158,13 +199,19 @@ def main():
         bid = b["id"]
         if only and bid not in only:
             continue
+        if bid in BAD_IDS:                             # 永久拉黑：删图 + 记 ok:false，绝不抓取
+            dest = os.path.join(IMG_DIR, "%d.jpg" % bid)
+            if os.path.exists(dest):
+                os.remove(dest)
+            manifest[str(bid)] = {"ok": False, "blacklisted": True}
+            continue
         dest = os.path.join(IMG_DIR, "%d.jpg" % bid)
         if not force and os.path.exists(dest) and os.path.getsize(dest) > 2000:
             skip += 1
             continue
         got = None
         source = None
-        for src_name, fn in (("off", off_image), ("wiki", wiki_image)):
+        for src_name, fn in (("off", off_image), ("wiki", wiki_image), ("commons", commons_image)):
             try:
                 got = fn(b["name_en"], b["brewery_en"])
                 if got:
