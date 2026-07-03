@@ -17,6 +17,9 @@
   };
   const CAT_ORDER = ["lager","pale","ipa","wheat","belgian","stout","sour","amber","strong","specialty"];
 
+  // 图片来源署名（CC 许可要求）
+  const SOURCE_LABEL = { off:"Open Food Facts", wiki:"Wikipedia", commons:"Wikimedia Commons" };
+
   // 每个家族的 emoji 池，卡片略作变化
   const EMOJI = {
     lager:["🍺","🍻"], pale:["🍺","🍻"], ipa:["🌿","🍺"], wheat:["🌾","🍺"],
@@ -33,16 +36,16 @@
          search:"搜索名称、酒厂、风格…", allOrigin:"全部产地", all:"全部",
          sortDefault:"默认", sortName:"按名称", sortAbv:"按酒精度", sortBrewery:"按酒厂", random:"随机一杯",
          noresults:"未找到符合条件的精酿", reset:"重置筛选",
-         lStyle:"风格", lAbv:"酒精度", lOrigin:"产地",
+         lStyle:"风格", lAbv:"酒精度", lOrigin:"产地", photo:"图片",
          prev:"← 上一款", next:"下一款 →",
-         footer:"按常规风格分类，精选世界上的精酿啤酒 · 建设中", langbtn:"EN" },
+         footer:"按常规风格分类，精选世界上的精酿啤酒 · 建设中 · 酒标图片来自 Open Food Facts、Wikipedia 与 Wikimedia Commons", langbtn:"EN" },
     en:{ sub:" Craft Beers", subtitle:"From golden Pilsner to the depths of Imperial Stout", beers:"beers", styles:"styles",
          search:"Search name, brewery, style…", allOrigin:"All origins", all:"All",
          sortDefault:"Default", sortName:"By name", sortAbv:"By ABV", sortBrewery:"By brewery", random:"Random pour",
          noresults:"No beers match your filters", reset:"Reset filters",
-         lStyle:"Style", lAbv:"ABV", lOrigin:"Origin",
+         lStyle:"Style", lAbv:"ABV", lOrigin:"Origin", photo:"Photo",
          prev:"← Prev", next:"Next →",
-         footer:"A curated gallery of the world's craft beers, organized by style · in progress", langbtn:"中" },
+         footer:"A curated gallery of the world's craft beers, organized by style · in progress · Label photos from Open Food Facts, Wikipedia & Wikimedia Commons", langbtn:"中" },
   };
   let lang = localStorage.getItem("craft-lang") || "zh";
 
@@ -153,6 +156,15 @@
     $("modal-style").textContent = styleOf(b);
     $("modal-abv").textContent = b.abv;
     $("modal-origin").textContent = originOf(b);
+    // 图片来源署名（CC 许可要求；无图或无来源则隐藏）
+    const cred = $("modal-credit"), info = IMG[b.id];
+    if (hasImg(b.id) && info && info.src) {
+      const label = SOURCE_LABEL[info.source] || info.source || "";
+      cred.innerHTML = `${I18N[lang].photo}: <a href="${info.src}" target="_blank" rel="noopener noreferrer">${label}</a>`;
+      cred.style.display = "";
+    } else {
+      cred.style.display = "none"; cred.innerHTML = "";
+    }
     const idx = filtered.findIndex(x=>x.id===id);
     $("modal-num").textContent = idx>=0 ? `${idx+1} / ${filtered.length}` : "";
     $("modal").classList.add("open");

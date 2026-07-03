@@ -135,6 +135,9 @@ select:hover{border-color:var(--accent2)}
 .modal-meta{margin-top:18px;display:grid;grid-template-columns:auto 1fr;gap:8px 16px;font-size:13.5px}
 .modal-meta dt{color:var(--ink-faint)}
 .modal-meta dd{color:var(--ink)}
+.modal-credit{font-size:11px;color:var(--ink-faint);margin-top:14px;line-height:1.5}
+.modal-credit a{color:var(--ink-dim);text-decoration:underline;text-underline-offset:2px}
+.modal-credit a:hover{color:var(--accent)}
 .modal-nav{margin-top:auto;padding-top:20px;display:flex;align-items:center;justify-content:space-between;gap:10px}
 .modal-nav button{background:var(--panel2);border:1px solid var(--line);color:var(--ink);
   padding:8px 14px;border-radius:16px;cursor:pointer;font-size:13px}
