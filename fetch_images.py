@@ -44,7 +44,18 @@ brothers finest liquids liquid state coast beer bier brau bräu nv inc ltd co th
 # 4/16/55=维森非目标款  56=施耐德错款 59=保拉纳柠檬 64=圣伯纳三料≠白 67=柏林Radler≠Weisse
 # 74=罗斯福8≠10  79=Delirium Red≠Tremens  90=早餐世涛配到KBS  94=Yeti配到巧克力橡木变体
 # 100=Fuller's配到London Pride  139=Rübæus配到Centennial IPA
-BAD_IDS = {4, 16, 55, 56, 59, 64, 67, 74, 79, 90, 94, 100, 139}
+BAD_IDS = {4, 16, 55, 56, 59, 64, 67, 74, 79, 90, 94, 100, 139,
+           # 第 2 批复核新增：同酒厂错款/变体歧义/无法核实
+           146,   # Weltenburger Barock Dunkel → 配到 Asam Bock
+           153,   # Einbecker Ur-Bock Hell → 配到 Winter-Bock
+           154,   # Samuel Adams Octoberfest → 配到 Boston Lager
+           157,   # Summit EPA → 配到别厂 Loch Lomond
+           164,   # Blazing World → Wikipedia 无法核实是否为该啤酒
+           171,   # Weihenstephaner Vitus → 配到 Hefeweissbier Alkoholfrei
+           175,   # Gouden Carolus → 产品名仅"Carolus"，Classic/Tripel 歧义
+           177,   # Maredsous → 6/8/10 号歧义
+           190,   # Petrus Aged Pale → 配到 Aged Red
+           194}   # Backwoods Bastard → 配到 Dirty Bastard
 
 def norm_tokens(s):
     s = re.sub(r"[^0-9a-zA-Zäöüßéèêàâçñ ]", " ", (s or "").lower())
