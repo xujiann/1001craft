@@ -75,23 +75,26 @@ select:hover{border-color:var(--accent2)}
 .cat-tab.active .dot{background:#231603}
 .cat-tab .cnt{opacity:.6;font-size:11.5px}
 
-/* gallery grid */
+/* gallery — 瀑布流（CSS 多列），适配纵向酒瓶图 */
 .gallery{max-width:1400px;margin:0 auto;padding:14px 22px 60px;
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:18px}
+  column-width:232px;column-gap:18px}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
-  overflow:hidden;cursor:pointer;transition:.18s;display:flex;flex-direction:column}
+  overflow:hidden;cursor:pointer;transition:.18s;
+  break-inside:avoid;-webkit-column-break-inside:avoid;margin:0 0 18px;display:block}
 .card:hover{transform:translateY(-4px);border-color:var(--cardc,var(--accent));
   box-shadow:0 12px 34px rgba(0,0,0,.5)}
-.card-img{aspect-ratio:4/3;position:relative;display:flex;align-items:center;justify-content:center;
+.card-img{position:relative;overflow:hidden}
+/* 有图：不放大（避免低分辨率瓶图糊），按自然尺寸居中，最高 380px，纵向瓶身完整展示 */
+.card-img.has-photo{background:var(--panel2)}
+.card-photo{display:block;max-width:100%;max-height:380px;margin:0 auto;background:var(--panel2)}
+/* 无图：竖版占位块（3:4，呼应瓶形），渐变 + emoji */
+.card-img.ph{aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;
   background:
     radial-gradient(120% 130% at 50% 0%, color-mix(in srgb,var(--cardc) 34%, transparent) 0%, transparent 62%),
-    linear-gradient(160deg,var(--panel2),var(--bg2));
-  overflow:hidden}
-.card-img::after{content:"";position:absolute;inset:0;
+    linear-gradient(160deg,var(--panel2),var(--bg2))}
+.card-img.ph::after{content:"";position:absolute;inset:0;
   background:repeating-linear-gradient(115deg,transparent 0 22px,rgba(255,255,255,.015) 22px 44px)}
-.card-emoji{font-size:46px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.4));opacity:.92;position:relative}
-.card-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;
-  background:var(--panel2)}
+.card-emoji{font-size:54px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.4));opacity:.92;position:relative}
 .card-cat{position:absolute;top:9px;left:9px;font-size:10.5px;font-weight:700;
   padding:3px 9px;border-radius:12px;background:color-mix(in srgb,var(--cardc) 26%, #231603 74%);
   color:var(--cardc);border:1px solid color-mix(in srgb,var(--cardc) 40%, transparent);z-index:2}
@@ -123,7 +126,7 @@ select:hover{border-color:var(--accent2)}
   background:
     radial-gradient(120% 120% at 50% 0%, color-mix(in srgb,var(--cardc) 38%, transparent) 0%, transparent 60%),
     linear-gradient(160deg,var(--panel2),var(--bg2));font-size:104px;overflow:hidden}
-.modal-img img{width:100%;height:100%;object-fit:cover;max-height:560px}
+.modal-img img{max-width:100%;max-height:min(70vh,560px);width:auto;height:auto;object-fit:contain;display:block}
 .modal-info{padding:26px 26px 22px;display:flex;flex-direction:column}
 .modal-cat-badge{align-self:flex-start;font-size:11px;font-weight:700;padding:4px 12px;border-radius:14px;
   background:color-mix(in srgb,var(--cardc) 26%, #231603 74%);color:var(--cardc);
@@ -151,6 +154,7 @@ select:hover{border-color:var(--accent2)}
   .modal-content{grid-template-columns:1fr}
   .modal-img{min-height:200px;font-size:76px}
   .header-title h1{font-size:22px}
-  .gallery{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
-  .card-emoji{font-size:38px}
+  .gallery{column-width:160px;column-gap:12px}
+  .card{margin-bottom:12px}
+  .card-emoji{font-size:42px}
 }

@@ -121,11 +121,15 @@
       noResults.style.display="none";
       gallery.innerHTML = filtered.map((b)=>{
         const m=CATS[b.cat];
-        const photo = hasImg(b.id) ? `<img class="card-photo" src="images/${b.id}.jpg" alt="" loading="lazy">` : "";
+        const has = hasImg(b.id);
+        const inner = has
+          ? `<img class="card-photo" src="images/${b.id}.jpg" alt="" loading="lazy">`
+          : `<span class="card-emoji">${emojiFor(b)}</span>`;
         return `<article class="card" data-id="${b.id}" style="--cardc:${m.color}">`+
-          `<div class="card-img"><span class="card-cat">${lang==="zh"?m.zh:m.en}</span>`+
+          `<div class="card-img ${has?"has-photo":"ph"}">`+
+          `<span class="card-cat">${lang==="zh"?m.zh:m.en}</span>`+
           `<span class="card-abv">${b.abv}</span>`+
-          `<span class="card-emoji">${emojiFor(b)}</span>${photo}</div>`+
+          `${inner}</div>`+
           `<div class="card-body">`+
             `<div class="card-name">${nameOf(b)}</div>`+
             `<div class="card-en">${subOf(b)}</div>`+
