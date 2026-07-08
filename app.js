@@ -1,6 +1,7 @@
 "use strict";
 (function () {
   const DATA = window.BEER_DATA || [];
+  document.documentElement.classList.add("js");   // 标记 JS 可用：骨架/淡入等增强只在此时启用
 
   // 风格家族元数据：label(zh/en), color var, 代表 emoji
   const CATS = {
@@ -55,6 +56,7 @@
   let sort = "default";
   let query = "";
   let filtered = [];
+  let firstPaint = true;   // 仅首屏做错落入场动画
   let IMG = {};           // _images.json 清单：{id:{ok:true,...}}
   const hasImg = id => IMG[id] && IMG[id].ok;
 
@@ -119,13 +121,17 @@
     if(!filtered.length){ gallery.innerHTML=""; noResults.style.display="block"; }
     else{
       noResults.style.display="none";
-      gallery.innerHTML = filtered.map((b)=>{
+      const first = firstPaint; firstPaint = false;
+      gallery.innerHTML = filtered.map((b,i)=>{
         const m=CATS[b.cat];
         const has = hasImg(b.id);
         const inner = has
-          ? `<img class="card-photo" src="images/${b.id}.jpg" alt="" loading="lazy">`
+          ? `<img class="card-photo" src="images/${b.id}.jpg" alt="" loading="lazy" decoding="async">`
           : `<span class="card-emoji">${emojiFor(b)}</span>`;
-        return `<article class="card" data-id="${b.id}" style="--cardc:${m.color}">`+
+        // 首屏错落入场：仅首次渲染加 .rise，延迟按序递增并封顶，避免搜索/筛选时闪烁
+        const rise = first ? " rise" : "";
+        const delay = first ? `;--d:${(Math.min(i,26)*0.03).toFixed(2)}s` : "";
+        return `<article class="card${rise}" data-id="${b.id}" style="--cardc:${m.color}${delay}">`+
           `<div class="card-img ${has?"has-photo":"ph"}">`+
           `<span class="card-cat">${lang==="zh"?m.zh:m.en}</span>`+
           `<span class="card-abv">${b.abv}</span>`+
@@ -138,6 +144,13 @@
           `</div></article>`;
       }).join("");
       gallery.querySelectorAll(".card").forEach(c=>c.onclick=()=>openModal(+c.dataset.id));
+      // 图片就绪后移除骨架、淡入（error 也移除，避免卡在微光态）
+      gallery.querySelectorAll(".card-img.has-photo").forEach(box=>{
+        const img=box.querySelector(".card-photo");
+        const done=()=>box.classList.add("loaded");
+        if(img.complete) done();   // 已在缓存/已就绪（含错误）直接揭示，避免卡在骨架
+        else { img.addEventListener("load",done,{once:true}); img.addEventListener("error",done,{once:true}); }
+      });
     }
     $("shown-count").textContent = filtered.length;
     $("style-count").textContent = new Set(DATA.map(b=>b.style_en)).size;

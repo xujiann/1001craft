@@ -83,10 +83,25 @@ select:hover{border-color:var(--accent2)}
   break-inside:avoid;-webkit-column-break-inside:avoid;margin:0 0 18px;display:block}
 .card:hover{transform:translateY(-4px);border-color:var(--cardc,var(--accent));
   box-shadow:0 12px 34px rgba(0,0,0,.5)}
+/* 首屏卡片入场（错落淡入上浮，仅首次渲染加 .rise） */
+@keyframes cardrise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.card.rise{animation:cardrise .5s cubic-bezier(.2,.7,.2,1) both;animation-delay:var(--d,0s)}
 .card-img{position:relative;overflow:hidden}
 /* 有图：不放大（避免低分辨率瓶图糊），按自然尺寸居中，最高 380px，纵向瓶身完整展示 */
+/* 加载中显示微光骨架，图片就绪后淡入。骨架/隐藏只在有 JS 时生效（无 JS 图片默认可见，防止卡死看不到图） */
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 .card-img.has-photo{background:var(--panel2)}
-.card-photo{display:block;max-width:100%;max-height:380px;margin:0 auto;background:var(--panel2)}
+.js .card-img.has-photo:not(.loaded){min-height:200px;
+  background-image:linear-gradient(100deg,var(--panel2) 30%,var(--panel) 50%,var(--panel2) 70%);
+  background-size:200% 100%;animation:shimmer 1.5s ease-in-out infinite}
+.card-photo{display:block;max-width:100%;max-height:380px;margin:0 auto;background:var(--panel2);
+  transition:opacity .45s ease}
+.js .card-img.has-photo:not(.loaded) .card-photo{opacity:0}
+@media (prefers-reduced-motion:reduce){
+  .card.rise{animation:none}
+  .js .card-img.has-photo:not(.loaded){animation:none}
+  .js .card-img.has-photo:not(.loaded) .card-photo{opacity:1;transition:none}
+}
 /* 无图：竖版占位块（3:4，呼应瓶形），渐变 + emoji */
 .card-img.ph{aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;
   background:
